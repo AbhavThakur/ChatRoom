@@ -3,7 +3,12 @@
 * In this chatroom the chat will not be stored , once the user get disconnected the  chat from his side is removed.
 
 $ This application is using socket.io for checking if a person is login or not , socket.io handles the if a new user has joined the room and leave the room
-# https://chatjoin.herokuapp.com/
+# https://chat-room-pink.vercel.app/
+# Password to join room :-
+ In order to unlock, a sequence you must guess,
+Four digits hold the key, nothing more, nothing less.
+Ascending they stand, one by one they rise,
+A numerical puzzle, can you surmise?
 
-* Password to join room :- 1234
+What am I?
 
