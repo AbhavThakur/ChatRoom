@@ -34,6 +34,7 @@ const elements = {
   // Chat Area
   sidebar: document.getElementById('chat-sidebar'),
   sidebarToggle: document.getElementById('sidebar-toggle'),
+  sidebarClose: document.getElementById('sidebar-close'),
   sidebarBackdrop: document.getElementById('sidebar-backdrop'),
   channelList: document.getElementById('channel-list'),
   userList: document.getElementById('user-list'),
@@ -210,12 +211,13 @@ socket.on('typingStatus', ({ typingUsers }) => {
     elements.typingIndicator.textContent = '';
   } else {
     elements.typingIndicator.style.display = 'block';
+    const dots = '<span class="typing-dots"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></span>';
     if (typingUsers.length === 1) {
-      elements.typingIndicator.innerHTML = `<i class="fas fa-pencil-alt"></i> <strong>${escapeHtml(typingUsers[0])}</strong> is typing...`;
+      elements.typingIndicator.innerHTML = `<i class="fas fa-pencil-alt"></i> <strong>${escapeHtml(typingUsers[0])}</strong> is typing${dots}`;
     } else if (typingUsers.length === 2) {
-      elements.typingIndicator.innerHTML = `<i class="fas fa-pencil-alt"></i> <strong>${escapeHtml(typingUsers[0])}</strong> and <strong>${escapeHtml(typingUsers[1])}</strong> are typing...`;
+      elements.typingIndicator.innerHTML = `<i class="fas fa-pencil-alt"></i> <strong>${escapeHtml(typingUsers[0])}</strong> and <strong>${escapeHtml(typingUsers[1])}</strong> are typing${dots}`;
     } else {
-      elements.typingIndicator.innerHTML = `<i class="fas fa-pencil-alt"></i> Several people are typing...`;
+      elements.typingIndicator.innerHTML = `<i class="fas fa-pencil-alt"></i> Several people are typing${dots}`;
     }
   }
 });
@@ -465,6 +467,21 @@ function updateRoomHeader() {
 function closeMobileSidebar() {
   if (elements.sidebar) elements.sidebar.classList.remove('open');
   if (elements.sidebarBackdrop) elements.sidebarBackdrop.classList.remove('active');
+  if (elements.sidebarToggle) elements.sidebarToggle.setAttribute('aria-expanded', 'false');
+}
+
+function openMobileSidebar() {
+  if (elements.sidebar) elements.sidebar.classList.add('open');
+  if (elements.sidebarBackdrop) elements.sidebarBackdrop.classList.add('active');
+  if (elements.sidebarToggle) elements.sidebarToggle.setAttribute('aria-expanded', 'true');
+}
+
+function toggleMobileSidebar() {
+  if (elements.sidebar && elements.sidebar.classList.contains('open')) {
+    closeMobileSidebar();
+  } else {
+    openMobileSidebar();
+  }
 }
 
 function selectChannel(roomName, isPrivate) {
@@ -805,16 +822,71 @@ function setupEventListeners() {
     }
   });
 
-  // Mobile sidebar toggle with backdrop overlay
-  elements.sidebarToggle.addEventListener('click', () => {
-    const isOpen = elements.sidebar.classList.toggle('open');
-    if (elements.sidebarBackdrop) {
-      elements.sidebarBackdrop.classList.toggle('active', isOpen);
+  // Mobile sidebar toggle and close with touch/outside-click listeners
+  if (elements.sidebarToggle) {
+    elements.sidebarToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMobileSidebar();
+    });
+  }
+
+  if (elements.sidebarClose) {
+    elements.sidebarClose.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeMobileSidebar();
+    });
+  }
+
+  // Backdrop overlay click and touch dismissal
+  if (elements.sidebarBackdrop) {
+    ['click', 'pointerdown', 'touchstart'].forEach((evtType) => {
+      elements.sidebarBackdrop.addEventListener(evtType, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        closeMobileSidebar();
+      }, { passive: false });
+    });
+  }
+
+  // Global outside pointer and click handler in capture phase
+  // Ensures that in app mode (installed PWA / mobile / desktop app wrap),
+  // tapping or clicking outside the drawer immediately closes it!
+  const handleOutsideSidebar = (e) => {
+    if (!elements.sidebar || !elements.sidebar.classList.contains('open')) return;
+    // Don't close if interacting inside the sidebar or on the toggle button
+    if (elements.sidebar.contains(e.target) || elements.sidebarToggle?.contains(e.target)) {
+      return;
+    }
+    closeMobileSidebar();
+  };
+
+  document.addEventListener('pointerdown', handleOutsideSidebar, true);
+  document.addEventListener('click', handleOutsideSidebar, true);
+
+  // Close sidebar on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && elements.sidebar?.classList.contains('open')) {
+      closeMobileSidebar();
     }
   });
 
-  if (elements.sidebarBackdrop) {
-    elements.sidebarBackdrop.addEventListener('click', closeMobileSidebar);
+  // Native mobile swipe-to-close gesture on sidebar drawer
+  let sidebarTouchStartX = 0;
+  let sidebarTouchStartY = 0;
+  if (elements.sidebar) {
+    elements.sidebar.addEventListener('touchstart', (e) => {
+      sidebarTouchStartX = e.changedTouches[0].clientX;
+      sidebarTouchStartY = e.changedTouches[0].clientY;
+    }, { passive: true });
+
+    elements.sidebar.addEventListener('touchend', (e) => {
+      const deltaX = e.changedTouches[0].clientX - sidebarTouchStartX;
+      const deltaY = e.changedTouches[0].clientY - sidebarTouchStartY;
+      // If user swiped left by more than 40px and dominant over vertical scroll
+      if (deltaX < -40 && Math.abs(deltaX) > Math.abs(deltaY)) {
+        closeMobileSidebar();
+      }
+    }, { passive: true });
   }
 
   // Export chat button

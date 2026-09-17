@@ -30,10 +30,10 @@
     <div class="cyber-glow cyber-glow-2"></div>
     
     <!-- Mobile Sidebar Backdrop Overlay -->
-    <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+    <div id="sidebar-backdrop" class="sidebar-backdrop" tabindex="-1" aria-hidden="true" title="Close sidebar"></div>
     
     <!-- Sidebar / Off-Canvas Drawer -->
-    <aside id="chat-sidebar" class="sidebar">
+    <aside id="chat-sidebar" class="sidebar" aria-label="Channels and active users navigation">
       <!-- App Header -->
       <div class="sidebar-header">
         <div class="brand">
@@ -43,9 +43,14 @@
             <span class="brand-version">v2.0 Hub</span>
           </div>
         </div>
-        <button id="btn-create-room" class="icon-btn" title="Create New Channel">
-          <i class="fas fa-plus"></i>
-        </button>
+        <div class="sidebar-header-actions">
+          <button id="btn-create-room" class="icon-btn" title="Create New Channel" aria-label="Create New Channel">
+            <i class="fas fa-plus"></i>
+          </button>
+          <button id="sidebar-close" class="icon-btn mobile-only sidebar-close-btn" title="Close Drawer" aria-label="Close Drawer">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
       </div>
 
       <!-- Channels List Section -->
@@ -97,7 +102,7 @@
       <!-- Top Navigation Header -->
       <header class="workspace-header">
         <div class="header-left">
-          <button id="sidebar-toggle" class="icon-btn mobile-only" title="Toggle Sidebar">
+          <button id="sidebar-toggle" class="icon-btn mobile-only" title="Toggle Sidebar" aria-label="Toggle Sidebar" aria-expanded="false" aria-controls="chat-sidebar">
             <i class="fas fa-bars"></i>
           </button>
           <div class="room-details">
