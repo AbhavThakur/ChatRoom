@@ -104,8 +104,8 @@ html[data-theme="light"] {
 }
 
 html, body {
-  height: 100dvh;
   height: 100vh;
+  height: 100dvh;
   width: 100vw;
   overflow: hidden;
   background-color: var(--bg-cosmos);
@@ -151,8 +151,8 @@ html, body {
 
 .app-layout {
   display: flex;
-  height: 100dvh;
   height: 100vh;
+  height: 100dvh;
   width: 100vw;
   position: relative;
   overflow: hidden;
@@ -578,6 +578,8 @@ html, body {
   z-index: 20;
   position: relative;
   overflow: hidden;
+  flex-shrink: 0;
+  min-height: 54px;
 }
 
 /* Futuristic Cyber Laser Scanline */
@@ -1901,11 +1903,11 @@ kbd {
 /* Tablet & Mobile Screens (<= 900px) */
 @media (max-width: 900px) {
   .mobile-only {
-    display: flex;
+    display: flex !important;
   }
 
   .hide-mobile {
-    display: none;
+    display: none !important;
   }
 
   /* Off-canvas sidebar */
@@ -1916,6 +1918,8 @@ kbd {
     bottom: 0;
     width: min(320px, 86vw);
     min-width: unset;
+    height: 100vh;
+    height: 100dvh;
     transform: translateX(-100%);
     box-shadow: 15px 0 45px rgba(0, 0, 0, 0.85);
     z-index: 50;
@@ -1929,6 +1933,23 @@ kbd {
 
   .workspace-header {
     padding: 10px 14px;
+    padding-top: max(10px, env(safe-area-inset-top));
+    min-height: 56px;
+    flex-shrink: 0;
+  }
+
+  #sidebar-toggle {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    background: rgba(0, 240, 255, 0.12);
+    border: 1px solid rgba(0, 240, 255, 0.35);
+    color: var(--cyber-cyan);
+    border-radius: 9px;
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.15);
   }
 
   .room-title-row h1 {
