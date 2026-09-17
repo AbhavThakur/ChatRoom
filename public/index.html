@@ -1,50 +1,435 @@
 <!DOCTYPE html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
-		<link
-			rel="stylesheet"
-			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css"
-			integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk="
-			crossorigin="anonymous"
-		/>
-		<link rel="stylesheet" href="css/style.css" />
-		<title>Chatroom App</title>
-	</head>
-	<body>
-		<p id="msg">welcome to Chatroom</p>
-		<div class="join-container">
-			<header class="join-header">
-				<h1><i class="fas fa-smile"></i> Chatroom</h1>
-			</header>
-			<main class="join-main">
-				<form action="chat.html">
-					<div class="form-control">
-						<label for="username">Username</label>
-						<input
-							type="text"
-							name="username"
-							id="username"
-							placeholder="Enter username..."
-							required
-						/>
-					</div>
-					<div class="form-control">
-						<label for="room">Room</label>
-						<select name="room" id="room">
-							<option value="JavaScript">JavaScript</option>
-							<option value="Python">Python</option>
-							<option value="PHP">PHP</option>
-							<option value="C#">C+</option>
-							<option value="Ruby">Ruby</option>
-						</select>
-					</div>
-					<button type="submit" class="btn">Join ChatRoom</button>
-				</form>
-			</main>
-		</div>
-		<script src="pass.js"></script>
-	</body>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>ChatRoom 2.0 — Futuristic Real-Time Collaboration Hub</title>
+  <meta name="description" content="A futuristic, real-time collaboration hub with dynamic channels, voice notes, code formatting, AI assistance, and webhook integrations." />
+  
+  <!-- Futuristic Typography: Space Grotesk, Plus Jakarta Sans, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#06080f" />
+
+  <!-- App Stylesheet -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- App Wrapper -->
+  <div id="app-container" class="app-layout">
+    <!-- Ambient Cyber Glows -->
+    <div class="cyber-glow cyber-glow-1"></div>
+    <div class="cyber-glow cyber-glow-2"></div>
+    
+    <!-- Mobile Sidebar Backdrop Overlay -->
+    <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+    
+    <!-- Sidebar / Off-Canvas Drawer -->
+    <aside id="chat-sidebar" class="sidebar">
+      <!-- App Header -->
+      <div class="sidebar-header">
+        <div class="brand">
+          <div class="brand-icon"><i class="fas fa-bolt"></i></div>
+          <div class="brand-text">
+            <h2>ChatRoom</h2>
+            <span class="brand-version">v2.0 Hub</span>
+          </div>
+        </div>
+        <button id="btn-create-room" class="icon-btn" title="Create New Channel">
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+
+      <!-- Channels List Section -->
+      <div class="sidebar-section">
+        <div class="section-title">
+          <span>CHANNELS</span>
+        </div>
+        <ul id="channel-list" class="nav-list">
+          <!-- Populated by app.js -->
+        </ul>
+      </div>
+
+      <!-- Active Users Section -->
+      <div class="sidebar-section flex-grow">
+        <div class="section-title">
+          <span>ACTIVE IN ROOM (<span id="room-member-count">0 online</span>)</span>
+        </div>
+        <ul id="user-list" class="nav-list user-nav-list">
+          <!-- Populated by app.js -->
+        </ul>
+      </div>
+
+      <!-- User Profile Card -->
+      <div class="user-profile-footer">
+        <div class="profile-info">
+          <div id="my-avatar" class="avatar my-avatar">U</div>
+          <div class="profile-meta">
+            <span id="my-username" class="profile-name">Guest</span>
+            <select id="user-status-select" class="status-dropdown">
+              <option value="online">🟢 Online</option>
+              <option value="away">🟡 Away</option>
+              <option value="busy">🔴 Busy</option>
+            </select>
+          </div>
+        </div>
+        <div class="footer-actions">
+          <button id="btn-mute-toggle" class="icon-btn sm" title="Mute notification sounds">
+            <i class="fas fa-volume-up"></i>
+          </button>
+          <button id="btn-theme-toggle" class="icon-btn sm" title="Switch Dark/Light Theme">
+            <i class="fas fa-sun"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Chat Workspace -->
+    <main class="chat-workspace">
+      <!-- Top Navigation Header -->
+      <header class="workspace-header">
+        <div class="header-left">
+          <button id="sidebar-toggle" class="icon-btn mobile-only" title="Toggle Sidebar">
+            <i class="fas fa-bars"></i>
+          </button>
+          <div class="room-details">
+            <div class="room-title-row">
+              <h1 id="current-room-title"># general</h1>
+              <span id="current-room-badge" class="room-badge">🌐 Public</span>
+            </div>
+            <p id="current-room-topic" class="room-topic">Real-time team chat and notifications</p>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <button id="btn-command-palette" class="btn btn-search" title="Search & Quick Actions (Cmd+K)">
+            <i class="fas fa-search"></i> <span class="hide-mobile">Search / Jump</span> <kbd>⌘K</kbd>
+          </button>
+          <button id="btn-huddle-toggle" class="btn btn-huddle" title="Join/Leave Audio & Video Huddle in this room">
+            <i class="fas fa-headphones"></i> <span class="hide-mobile">Huddle</span>
+          </button>
+          <button id="btn-pinned-toggle" class="icon-btn" title="Pinned Messages">
+            <i class="fas fa-thumbtack"></i>
+          </button>
+          <button id="btn-webhook-guide" class="btn btn-outline" title="Connect external projects & webhooks">
+            <i class="fas fa-plug"></i> <span class="hide-mobile">Integrations</span>
+          </button>
+          <button id="btn-export-chat" class="icon-btn" title="Export chat history (Markdown / JSON)">
+            <i class="fas fa-download"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Pinned Messages Banner -->
+      <div id="pinned-bar" class="pinned-bar" style="display: none;"></div>
+
+      <!-- Message History Container -->
+      <section id="chat-messages" class="messages-container" tabindex="0">
+        <!-- Messages rendered by app.js -->
+      </section>
+
+      <!-- Typing Indicator -->
+      <div id="typing-indicator" class="typing-bar" style="display: none;"></div>
+
+      <!-- Previews for Attachments & Replies -->
+      <div id="reply-preview" class="reply-preview-container" style="display: none;"></div>
+      <div id="attachment-preview" class="attachment-preview-container" style="display: none;"></div>
+
+      <!-- Chat Input Area -->
+      <footer class="chat-input-footer">
+        <form id="chat-form" class="input-form">
+          <!-- Toolbar Buttons -->
+          <div class="input-toolbar">
+            <label for="attachment-input" class="icon-btn input-action-btn" title="Attach Image or File (or paste Ctrl+V)">
+              <i class="fas fa-paperclip"></i>
+            </label>
+            <input type="file" id="attachment-input" accept="image/*,.pdf,.txt,.json,.md" style="display: none;" />
+
+            <button type="button" id="btn-code-snippet" class="icon-btn input-action-btn" title="Insert Code Snippet">
+              <i class="fas fa-code"></i>
+            </button>
+
+            <button type="button" id="btn-voice-record" class="icon-btn input-action-btn" title="Record Voice Note">
+              <i class="fas fa-microphone"></i>
+            </button>
+
+            <div class="emoji-wrapper">
+              <button type="button" id="btn-emoji-toggle" class="icon-btn input-action-btn" title="Emoji Picker">
+                <i class="far fa-smile"></i>
+              </button>
+              <div id="emoji-picker" class="emoji-dropdown">
+                <button type="button" class="emoji-btn">😀</button>
+                <button type="button" class="emoji-btn">😂</button>
+                <button type="button" class="emoji-btn">😍</button>
+                <button type="button" class="emoji-btn">🔥</button>
+                <button type="button" class="emoji-btn">🚀</button>
+                <button type="button" class="emoji-btn">👍</button>
+                <button type="button" class="emoji-btn">🎉</button>
+                <button type="button" class="emoji-btn">💡</button>
+                <button type="button" class="emoji-btn">💯</button>
+                <button type="button" class="emoji-btn">💻</button>
+                <button type="button" class="emoji-btn">⚡</button>
+                <button type="button" class="emoji-btn">❤️</button>
+                <button type="button" class="emoji-btn">👀</button>
+                <button type="button" class="emoji-btn">✨</button>
+                <button type="button" class="emoji-btn">☕</button>
+                <button type="button" class="emoji-btn">🤝</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Main Input Field -->
+          <div class="input-field-wrapper">
+            <input
+              type="text"
+              id="message-input"
+              placeholder="Message #general (type @bot for AI assistant, Shift+Enter for new line)..."
+              autocomplete="off"
+            />
+          </div>
+
+          <!-- Send Button -->
+          <button type="submit" id="send-btn" class="send-btn" title="Send Message">
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </form>
+      </footer>
+    </main>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODALS                                                   -->
+  <!-- ======================================================== -->
+
+  <!-- 1. Join / Welcome Modal -->
+  <div id="login-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-badge"><i class="fas fa-comments"></i></div>
+        <h2>Welcome to ChatRoom 2.0</h2>
+        <p>A real-time workspace for discussion, alerts, and developer collaboration.</p>
+      </div>
+      <form id="login-form" class="modal-form">
+        <div class="form-group">
+          <label for="login-username">Choose a Username</label>
+          <div class="input-icon-wrap">
+            <i class="fas fa-user"></i>
+            <input type="text" id="login-username" placeholder="e.g. Abhav" required maxlength="25" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="login-room">Select Starting Channel</label>
+          <div class="input-icon-wrap">
+            <i class="fas fa-hashtag"></i>
+            <select id="login-room">
+              <option value="general">general (Main Hangout)</option>
+              <option value="dev-chat">dev-chat (Code & Architecture)</option>
+              <option value="project-alerts">project-alerts (Webhooks & CI/CD)</option>
+              <option value="ai-lounge">ai-lounge (Chat with @bot)</option>
+              <option value="random">random (Casual)</option>
+            </select>
+          </div>
+        </div>
+        <div id="login-passcode-group" class="form-group" style="display: none;">
+          <label for="login-passcode">Room Passcode (Optional)</label>
+          <div class="input-icon-wrap">
+            <i class="fas fa-key"></i>
+            <input type="password" id="login-passcode" placeholder="Enter password if private" />
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary full-width">
+          <span>Enter ChatRoom</span> <i class="fas fa-arrow-right"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. Create Channel Modal -->
+  <div id="create-room-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <button class="modal-close" onclick="closeModal('create-room-modal')">&times;</button>
+        <h2>Create Channel</h2>
+        <p>Channels are where members collaborate on specific topics.</p>
+      </div>
+      <form id="create-room-form" class="modal-form">
+        <div class="form-group">
+          <label for="new-room-name">Channel Name</label>
+          <div class="input-icon-wrap">
+            <i class="fas fa-hashtag"></i>
+            <input type="text" id="new-room-name" placeholder="e.g. backend-tasks, trip-planning" required maxlength="30" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="new-room-topic">Topic / Description</label>
+          <input type="text" id="new-room-topic" placeholder="What is this channel about?" />
+        </div>
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="new-room-private" onchange="document.getElementById('passcode-field-wrap').style.display = this.checked ? 'block' : 'none';" />
+            <span>Make this channel private (requires passcode)</span>
+          </label>
+        </div>
+        <div id="passcode-field-wrap" class="form-group" style="display: none;">
+          <label for="new-room-passcode">Passcode Key</label>
+          <input type="password" id="new-room-passcode" placeholder="Enter secure room passcode" />
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('create-room-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create Channel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. Webhook & Integration Guide Modal -->
+  <div id="webhook-modal" class="modal-backdrop">
+    <div class="modal-card wide">
+      <div class="modal-header">
+        <button class="modal-close" onclick="closeModal('webhook-modal')">&times;</button>
+        <h2><i class="fas fa-plug text-accent"></i> Project Webhook Integration</h2>
+        <p>Connect your daily scripts, GitHub Actions, recruiting tools, or travel planners directly to ChatRoom!</p>
+      </div>
+      <div class="modal-body scrollable">
+        <p>You can send HTTP POST requests from any language or terminal to push automated notifications into the current channel.</p>
+        
+        <div class="code-guide-section">
+          <h4>1. Send via cURL (Terminal / Bash script)</h4>
+          <pre><code id="webhook-curl-code" class="language-bash"></code></pre>
+          <button class="btn btn-sm btn-outline" onclick="copyCodeSnippet(this)" data-code="" id="btn-copy-curl">Copy cURL</button>
+        </div>
+
+        <div class="code-guide-section">
+          <h4>2. Send via JavaScript / Node.js</h4>
+          <pre><code id="webhook-js-code" class="language-javascript"></code></pre>
+        </div>
+
+        <div class="tip-card">
+          <i class="fas fa-lightbulb"></i>
+          <div>
+            <strong>Use case ideas for your projects:</strong>
+            <ul>
+              <li><strong>Recruiting Intelligence project:</strong> Notify yourself whenever a new candidate profile or match is discovered.</li>
+              <li><strong>Travel Planner project:</strong> Push itinerary updates, flight alert changes, or booking reminders.</li>
+              <li><strong>CI/CD & GitHub:</strong> Alert your team on build failures or successful deployments.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('webhook-modal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Code Snippet Insert Modal -->
+  <div id="code-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <button class="modal-close" onclick="closeModal('code-modal')">&times;</button>
+        <h2>Insert Code Snippet</h2>
+        <p>Format code cleanly with syntax highlighting and a 1-click copy button.</p>
+      </div>
+      <form id="code-form" class="modal-form">
+        <div class="form-group">
+          <label for="code-lang-select">Language</label>
+          <select id="code-lang-select">
+            <option value="javascript">JavaScript</option>
+            <option value="typescript">TypeScript</option>
+            <option value="python">Python</option>
+            <option value="bash">Bash / Shell</option>
+            <option value="html">HTML</option>
+            <option value="css">CSS</option>
+            <option value="sql">SQL</option>
+            <option value="json">JSON</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="code-snippet-textarea">Code</label>
+          <textarea id="code-snippet-textarea" rows="8" placeholder="// Paste your code here..." required></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('code-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Post Snippet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 5. Passcode Unlock Modal -->
+  <div id="passcode-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <button class="modal-close" onclick="closeModal('passcode-modal')">&times;</button>
+        <h2>🔒 Private Channel</h2>
+        <p>This channel is passcode protected. Enter the key to join.</p>
+      </div>
+      <form id="passcode-form" class="modal-form">
+        <input type="hidden" id="passcode-room-name" />
+        <div class="form-group">
+          <label for="room-passcode-input">Passcode</label>
+          <input type="password" id="room-passcode-input" placeholder="Enter room passcode..." required />
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('passcode-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Unlock & Join</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 6. Command Palette & Quick Switcher Modal (Cmd+K) -->
+  <div id="command-palette-modal" class="modal-backdrop command-palette-backdrop">
+    <div class="command-palette-card">
+      <div class="palette-input-wrap">
+        <i class="fas fa-search"></i>
+        <input type="text" id="palette-search-input" placeholder="Type a command, #channel, or search messages..." autocomplete="off" />
+        <span class="esc-badge">ESC</span>
+      </div>
+      <div id="palette-results" class="palette-results-list">
+        <!-- Dynamically rendered by app.js -->
+      </div>
+      <div class="palette-footer">
+        <span><kbd>↑</kbd> <kbd>↓</kbd> to navigate</span>
+        <span><kbd>↵</kbd> to select</span>
+        <span><kbd>esc</kbd> to dismiss</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. Pinned Messages Modal -->
+  <div id="pinned-modal" class="modal-backdrop">
+    <div class="modal-card wide">
+      <div class="modal-header">
+        <button class="modal-close" onclick="closeModal('pinned-modal')">&times;</button>
+        <h2><i class="fas fa-thumbtack text-accent"></i> Pinned Messages in Current Channel</h2>
+        <p>Key links, notes, and messages pinned for quick reference.</p>
+      </div>
+      <div id="pinned-messages-list" class="modal-body scrollable">
+        <!-- Rendered by app.js -->
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('pinned-modal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="chat-toast" class="chat-toast"></div>
+
+  <!-- Client JavaScript Modules -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/sounds.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/webrtc.js"></script>
+  <script src="js/app.js"></script>
+</body>
 </html>
