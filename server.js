@@ -433,9 +433,11 @@ io.on('connection', (socket) => {
   });
 
   socket.on('huddleSignal', ({ targetId, signal }) => {
+    const user = getCurrentUser(socket.id);
     io.to(targetId).emit('huddleSignal', {
       senderId: socket.id,
-      signal
+      signal,
+      username: user ? user.username : 'Participant'
     });
   });
 
